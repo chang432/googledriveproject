@@ -1,5 +1,11 @@
-apply plugin: 'java'
-apply plugin: 'application'
+plugins {
+    id 'java'
+    id 'application'
+    id "org.openjfx.javafxplugin" version "0.1.0"
+}
+//apply plugin: 'java'
+//apply plugin: 'application'
+//apply plugin: 'org.openjfx.javafxplugin'
 
 mainClassName = 'DriveMain'
 sourceCompatibility = 11
@@ -16,6 +22,13 @@ dependencies {
     implementation 'com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+mainClassName = 'DriveApplication'
+
+javafx {
+    version = '17.0.2'
+    modules = ['javafx.controls', 'javafx.fxml']
 }
 
 test {

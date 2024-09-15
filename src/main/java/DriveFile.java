@@ -21,4 +21,20 @@ public class DriveFile {
     public String toString() {
         return "{id: "+Id+",Name: "+Name+",Type: "+Type+",LastModifiedDate: "+LastModifiedDate+"}";
     }
+
+    public String getId() {
+        return Id;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public String getType() {
+        return Type;
+    }
+
+    public DateTime getLastModifiedDate() {
+        return LastModifiedDate;
+    }
 }

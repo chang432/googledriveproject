@@ -82,7 +82,6 @@ public class DriveMain {
    *
    * @param HTTP_TRANSPORT The network HTTP Transport.
    * @return An authorized Credential object.
-   * @throws IOException If the credentials.json file cannot be found.
    */
   private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
       throws IOException {
@@ -106,12 +105,12 @@ public class DriveMain {
     return credential;
   }
 
-  private static List<DriveFile> getFiles() throws IOException {
+  public static List<DriveFile> getFiles() throws IOException {
     List<DriveFile> res = new ArrayList<>();
 
     // Print the names and IDs for up to 10 files
     String pageToken = null;
-    int pageSize = 40;
+    int pageSize = 8;
 
     FileList result = service.files().list()
             .setPageSize(pageSize)
