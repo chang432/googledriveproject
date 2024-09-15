@@ -18,38 +18,23 @@ import com.google.api.services.drive.model.StartPageToken;
 
 import java.io.*;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /* class to demonstrate use of Drive files list API */
 public class DriveMain {
-  /**
-   * Application name.
-   */
-  private static final String APPLICATION_NAME = "Google Drive API Java Quickstart";
-  /**
-   * Global instance of the JSON factory.
-   */
-  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-  /**
-   * Directory to store authorization tokens for this application.
-   */
-  private static final String TOKENS_DIRECTORY_PATH = "tokens";
-
+  private static final String APPLICATION_NAME = "Google Drive Application";
+  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();  // Global instance of the JSON factory.
+  private static final String TOKENS_DIRECTORY_PATH = "tokens";  // Directory to store authorization tokens for this application.
   private static final int PAGE_SIZE = 10;    // default number of files displayed
-
   private static Drive service;
-
   private static String pageToken;
 
-  /**
-   * Global instance of the scopes required by this quickstart.
-   * If modifying these scopes, delete your previously saved tokens/ folder.
-   */
   private static final List<String> SCOPES =
       Collections.singletonList(DriveScopes.DRIVE);
   private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-  /** MIMETYPE returned by java api mapped to working MIMETYPE and corresponding file extension */
+  /** MIMETYPE returned by java api mapped to working MIMETYPE */
   private static final Map<String, String> MIMETYPE_MAP = new HashMap<>();
   static {
     MIMETYPE_MAP.put("application/vnd.google-apps.document", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
@@ -66,20 +51,13 @@ public class DriveMain {
     MIMETYPE_EXTENSIONS_MAP.put("text/plain", ".txt");
   }
 
+  /** File extension mapped to working MIMETYPE */
   private static final Map<String, String> EXTENSION_MIMETYPE_MAP = new HashMap<>();
   static {
     EXTENSION_MIMETYPE_MAP.put(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     EXTENSION_MIMETYPE_MAP.put(".csv", "text/csv");
     EXTENSION_MIMETYPE_MAP.put(".pdf", "application/pdf");
     EXTENSION_MIMETYPE_MAP.put(".txt", "text/plain");
-  }
-
-  public static void initService() throws IOException, GeneralSecurityException {
-    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-            .setApplicationName(APPLICATION_NAME)
-            .build();
-    pageToken = null;
   }
 
   /**
@@ -105,9 +83,18 @@ public class DriveMain {
         .setAccessType("offline")
         .build();
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-    Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-    //returns an authorized Credential object.
-    return credential;
+    return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+  }
+
+  /**
+   * Initialization logic required for Google Drive API
+   */
+  public static void initService() throws IOException, GeneralSecurityException {
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            .setApplicationName(APPLICATION_NAME)
+            .build();
+    pageToken = null;
   }
 
   /**
@@ -136,8 +123,6 @@ public class DriveMain {
       System.out.println("No files found.");
     } else {
       for (File file : files) {
-//        System.out.println(file.getModifiedTime() + "," + file.getCreatedTime() + "," + file.getModifiedByMeTime());
-//        System.out.println(file.getName() + ", " + file.getId() + ", " + file.getSize());
         DriveFile fileDrive = new DriveFile(file.getId(), file.getName(), file.getMimeType(), file.getModifiedTime());
         res.add(fileDrive);
       }
@@ -145,6 +130,12 @@ public class DriveMain {
     return res;
   }
 
+  /**
+   * Downloads a file from Google Drive
+   *
+   * @param file The desired Google Drive file to be downloaded represented as a DriveFile object
+   * @param destination The desired local target directory for the file to be downloaded to
+   */
   public static void downloadFile(DriveFile file, String destination) throws IOException {
     boolean isDocsDownload = false;
 
@@ -173,6 +164,12 @@ public class DriveMain {
     outputStream.close();
   }
 
+  /**
+   * Upload a file from local system to Google Drive
+   *
+   * @param source The path of the desired file to be uploaded to Google Drive
+   * @return The uploaded file represented as a DriveFile object
+   */
   public static DriveFile uploadFile(String source) throws IOException {
     String extension = source.substring(source.lastIndexOf("."), source.length());
 
@@ -187,6 +184,11 @@ public class DriveMain {
     return new DriveFile(file.getId(), file.getName(), file.getMimeType(), file.getModifiedTime());
   }
 
+  /**
+   * Delete a file from Google Drive
+   *
+   * @param file The desired file to be deleted represented as a DriveFile object
+   */
   public static void deleteFile(DriveFile file) throws IOException {
     service.files().delete(file.Id).execute();
     System.out.println("File deleted successfully");

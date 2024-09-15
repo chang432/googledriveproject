@@ -3,9 +3,6 @@ plugins {
     id 'application'
     id "org.openjfx.javafxplugin" version "0.1.0"
 }
-//apply plugin: 'java'
-//apply plugin: 'application'
-//apply plugin: 'org.openjfx.javafxplugin'
 
 mainClassName = 'DriveMain'
 sourceCompatibility = 11
