@@ -18,7 +18,6 @@ import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
-/* class to demonstrate use of Drive files list API */
 public class DriveMain {
   private static final String APPLICATION_NAME = "Google Drive Application";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();  // Global instance of the JSON factory.
