@@ -4,6 +4,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.TableViewSkin;
+import javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -12,6 +15,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -19,9 +23,16 @@ public class DriveApplication extends Application {
 
     private static TableView<DriveFile> table;
 
+    private static ObservableList<DriveFile> fileList;
+
     private static void refreshTable() throws IOException {
-        ObservableList<DriveFile> fileList = FXCollections.observableArrayList(DriveMain.getFiles());
+        fileList = FXCollections.observableArrayList(DriveMain.getFiles(true));
         table.setItems(fileList);
+        table.scrollTo(0);
+    }
+
+    private static void loadMoreItems() throws IOException {
+        fileList.addAll(DriveMain.getFiles(false));
     }
 
     private static void alert(String message) {
@@ -30,11 +41,22 @@ public class DriveApplication extends Application {
         alert.showAndWait();
     }
 
+    // Method to check if the user is at the bottom of the table
+    private boolean isScrolledToBottom(TableView<?> table) {
+        TableViewSkin<?> skin = (TableViewSkin<?>)table.getSkin();
+        if (skin != null) {
+            VirtualFlow<?> virtualFlow = (VirtualFlow<?>) skin.getChildren().get(1);
+            int lastVisibleIndex = virtualFlow.getLastVisibleCell().getIndex();
+            int lastIndex = table.getItems().size()-1;
+            return lastVisibleIndex == lastIndex;
+        }
+        return false;
+    }
+
     @Override
     public void start(Stage primaryStage) throws IOException {
-        ObservableList<DriveFile> fileList = FXCollections.observableArrayList(DriveMain.getFiles());
-
         table = new TableView<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 
         TableColumn<DriveFile, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().Name));
@@ -43,8 +65,8 @@ public class DriveApplication extends Application {
         typeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().Type));
 
         TableColumn<DriveFile, String> dateColumn = new TableColumn<>("Modified Date");
-//        dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().LastModifiedDate.toString()));
-        dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(""));
+        dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().LastModifiedDate.toString()));
+//        dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(""));
 
         table.getColumns().addAll(nameColumn, typeColumn, dateColumn);
 
@@ -125,6 +147,17 @@ public class DriveApplication extends Application {
                 }
             } else {
                 System.out.println("No file selected for deletion.");
+            }
+        });
+
+        table.setOnScroll(event -> {
+            if (isScrolledToBottom(table)) {
+                System.out.println("SCROLLED TO BOTTOM");
+                try {
+                    loadMoreItems();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 

@@ -35,7 +35,11 @@ public class DriveMain {
    */
   private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
+  private static final int PAGE_SIZE = 10;    // default number of files displayed
+
   private static Drive service;
+
+  private static String pageToken;
 
   /**
    * Global instance of the scopes required by this quickstart.
@@ -75,6 +79,7 @@ public class DriveMain {
     service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
             .setApplicationName(APPLICATION_NAME)
             .build();
+    pageToken = null;
   }
 
   /**
@@ -105,26 +110,33 @@ public class DriveMain {
     return credential;
   }
 
-  public static List<DriveFile> getFiles() throws IOException {
+  /**
+   * Queries a batch of Google Drive files. Subsequent calls returns a new batch of files
+   *
+   * @param startOver start query from the beginning when set to true
+   * @return List of Google Drive files represented as DriveFile objects
+   */
+  public static List<DriveFile> getFiles(boolean startOver) throws IOException {
+    if (startOver) {
+      pageToken = "";
+    }
+
     List<DriveFile> res = new ArrayList<>();
 
-    // Print the names and IDs for up to 10 files
-    String pageToken = null;
-    int pageSize = 8;
-
     FileList result = service.files().list()
-            .setPageSize(pageSize)
+            .setFields("nextPageToken, files(modifiedTime,id,name,mimeType)")
+            .setPageSize(PAGE_SIZE)
             .setPageToken(pageToken)
             .execute();
     List<File> files = result.getFiles();
 
-//    System.out.println(result.getNextPageToken());
+    pageToken = result.getNextPageToken();
 
     if (files == null || files.isEmpty()) {
       System.out.println("No files found.");
     } else {
       for (File file : files) {
-        System.out.println(file);
+//        System.out.println(file.getModifiedTime() + "," + file.getCreatedTime() + "," + file.getModifiedByMeTime());
 //        System.out.println(file.getName() + ", " + file.getId() + ", " + file.getSize());
         DriveFile fileDrive = new DriveFile(file.getId(), file.getName(), file.getMimeType(), file.getModifiedTime());
         res.add(fileDrive);
@@ -183,15 +195,18 @@ public class DriveMain {
   public static void main(String... args) throws IOException, GeneralSecurityException {
     // Build a new authorized API client service.
     initService();
-//    List<DriveFile> test = getFiles();
+    List<DriveFile> test = getFiles(false);
+    test.forEach(i -> System.out.println(i.toString()));
+    System.out.println("-----");
+    List<DriveFile> test1 = getFiles(false);
+    test1.forEach(i -> System.out.println(i.toString()));
 //    System.out.println(test.get(0).toString());
-    DriveFile testDoc = new DriveFile("1QRqhhwP9v6KeHoQ_T_3OVyT_l7uvekWHBpCCu5eLOcA", "TESTDOC", "application/vnd.google-apps.document", null);
+//    DriveFile testDoc = new DriveFile("1QRqhhwP9v6KeHoQ_T_3OVyT_l7uvekWHBpCCu5eLOcA", "TESTDOC", "application/vnd.google-apps.document", null);
 //    DriveFile testTest = new DriveFile("16VVWywDmoLuTHbL2C9CZT1XSux4NDpcA", "test_file", "application/pdf", null);
 //    DriveFile textSheet = new DriveFile("1DSsH27NQ11qy0EWkOO2mVAjUHqBLhrz4uFo-gUO_BLk", "Japan 2025", "application/vnd.google-apps.spreadsheet", null);
 //    DriveFile n = uploadFile("./hello.txt");
-    downloadFile(testDoc,"./src");
+//    downloadFile(testDoc,"./src");
 //    System.out.println(n);
 //    deleteFile(testDoc);
-//    test.forEach(i -> System.out.println(i.toString()));
   }
 }
