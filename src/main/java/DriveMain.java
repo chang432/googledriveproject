@@ -4,6 +4,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -45,10 +46,35 @@ public class DriveMain {
   private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
   /** MIMETYPE returned by java api mapped to working MIMETYPE and corresponding file extension */
-  private static final Map<String, List<String>> MIMETYPE_MAP = new HashMap<>();
+  private static final Map<String, String> MIMETYPE_MAP = new HashMap<>();
   static {
-    MIMETYPE_MAP.put("application/vnd.google-apps.document", Arrays.asList("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"));
-    MIMETYPE_MAP.put("application/vnd.google-apps.spreadsheet", Arrays.asList("text/csv", ".csv"));
+    MIMETYPE_MAP.put("application/vnd.google-apps.document", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    MIMETYPE_MAP.put("application/vnd.google-apps.spreadsheet", "text/csv");
+    MIMETYPE_MAP.put("application/octet-stream", "text/plain");
+  }
+
+  /** Working MIMETYPE mapped to file extension */
+  private static final Map<String, String> MIMETYPE_EXTENSIONS_MAP = new HashMap<>();
+  static {
+    MIMETYPE_EXTENSIONS_MAP.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx");
+    MIMETYPE_EXTENSIONS_MAP.put("text/csv", ".csv");
+    MIMETYPE_EXTENSIONS_MAP.put("application/pdf", ".pdf");
+    MIMETYPE_EXTENSIONS_MAP.put("text/plain", ".txt");
+  }
+
+  private static final Map<String, String> EXTENSION_MIMETYPE_MAP = new HashMap<>();
+  static {
+    EXTENSION_MIMETYPE_MAP.put(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    EXTENSION_MIMETYPE_MAP.put(".csv", "text/csv");
+    EXTENSION_MIMETYPE_MAP.put(".pdf", "application/pdf");
+    EXTENSION_MIMETYPE_MAP.put(".txt", "text/plain");
+  }
+
+  public static void initService() throws IOException, GeneralSecurityException {
+    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+    service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            .setApplicationName(APPLICATION_NAME)
+            .build();
   }
 
   /**
@@ -108,30 +134,65 @@ public class DriveMain {
     return res;
   }
 
-  private static void downloadFile(DriveFile file, String destination) throws IOException {
-    String mimetype = MIMETYPE_MAP.get(file.Type).get(0);
-    String extension = MIMETYPE_MAP.get(file.Type).get(1);
+  public static void downloadFile(DriveFile file, String destination) throws IOException {
+    boolean isDocsDownload = false;
+
+    String mimetype = file.Type;
+
+    // Figure out what kind of download to do
+    if (file.Type.contains("vnd.google-apps")) {
+      isDocsDownload = true;
+    }
+
+    // Use valid mimetype if the given one is google api default
+    if (MIMETYPE_MAP.containsKey(file.Type)) {
+      mimetype = MIMETYPE_MAP.get(file.Type);
+    }
+
+    String extension = MIMETYPE_EXTENSIONS_MAP.get(mimetype);
 
     String destFilePath = destination + "/" + file.Name.replace(" ","-") + extension;
-
+    System.out.println(destFilePath + ", " + mimetype);
     OutputStream outputStream = new FileOutputStream(destFilePath);
-    service.files().export(file.Id, mimetype).executeMediaAndDownloadTo(outputStream);
+    if (isDocsDownload) {
+      service.files().export(file.Id, mimetype).executeMediaAndDownloadTo(outputStream);
+    } else {
+      service.files().get(file.Id).executeMediaAndDownloadTo(outputStream);
+    }
     outputStream.close();
+  }
 
+  public static DriveFile uploadFile(String source) throws IOException {
+    String extension = source.substring(source.lastIndexOf("."), source.length());
+
+    FileContent mediaContent = new FileContent(EXTENSION_MIMETYPE_MAP.get(extension), new java.io.File(source));
+
+    File fileMetadata = new File();
+    fileMetadata.setName(source.substring(source.lastIndexOf("/")+1,source.lastIndexOf(".")));
+
+    System.out.println(mediaContent + ", " + fileMetadata);
+    File file = service.files().create(fileMetadata, mediaContent)
+            .execute();
+    return new DriveFile(file.getId(), file.getName(), file.getMimeType(), file.getModifiedTime());
+  }
+
+  public static void deleteFile(DriveFile file) throws IOException {
+    service.files().delete(file.Id).execute();
+    System.out.println("File deleted successfully");
   }
 
   public static void main(String... args) throws IOException, GeneralSecurityException {
     // Build a new authorized API client service.
-    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-        .setApplicationName(APPLICATION_NAME)
-        .build();
-
-    List<DriveFile> test = getFiles();
+    initService();
+//    List<DriveFile> test = getFiles();
 //    System.out.println(test.get(0).toString());
-    DriveFile testDoc = new DriveFile("1anjhzNnMWRmugY8UgyEJyKPhIJAW7bA2WdGhTVoUymM", "TESTDOC", "application/vnd.google-apps.document", null);
-    DriveFile textSheet = new DriveFile("1DSsH27NQ11qy0EWkOO2mVAjUHqBLhrz4uFo-gUO_BLk", "Japan 2025", "application/vnd.google-apps.spreadsheet", null);
-    downloadFile(textSheet, "./");
+    DriveFile testDoc = new DriveFile("1QRqhhwP9v6KeHoQ_T_3OVyT_l7uvekWHBpCCu5eLOcA", "TESTDOC", "application/vnd.google-apps.document", null);
+//    DriveFile testTest = new DriveFile("16VVWywDmoLuTHbL2C9CZT1XSux4NDpcA", "test_file", "application/pdf", null);
+//    DriveFile textSheet = new DriveFile("1DSsH27NQ11qy0EWkOO2mVAjUHqBLhrz4uFo-gUO_BLk", "Japan 2025", "application/vnd.google-apps.spreadsheet", null);
+//    DriveFile n = uploadFile("./hello.txt");
+    downloadFile(testDoc,"./src");
+//    System.out.println(n);
+//    deleteFile(testDoc);
 //    test.forEach(i -> System.out.println(i.toString()));
   }
 }
