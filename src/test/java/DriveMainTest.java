@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -5,38 +6,77 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DriveMainTest {
+    @BeforeEach
+    public void setUp() throws GeneralSecurityException, IOException {
+        DriveMain.initService();
+    }
+
 
     @Test
-    void testUploadDownloadDeleteMethod() {
+    void testUploadDownloadDeleteTextFile() throws IOException {
         Path filePath = Paths.get("./test_file.txt");
         String content = "test contents";
-        try {
-            DriveMain.initService();
 
-            Files.write(filePath, content.getBytes());
-            DriveFile testFile = DriveMain.uploadFile(filePath.toString());
+        Files.write(filePath, content.getBytes());
+        DriveFile testFile = DriveMain.uploadFile(filePath.toString());
 
-            Files.delete(filePath);
-            System.out.println(testFile);
-            DriveMain.downloadFile(testFile, ".");
+        Files.delete(filePath);
+        System.out.println(testFile);
+        DriveMain.downloadFile(testFile, ".");
 
-            DriveMain.deleteFile(testFile);
+        DriveMain.deleteFile(testFile);
 
-            assertTrue(Files.exists(filePath));
-            Files.delete(filePath);
-        } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
+        assertTrue(Files.exists(filePath));
+        Files.delete(filePath);
+
     }
 
     @Test
-    void testAnotherMethod() {
-        // Add more test methods as needed
+    void testUploadDownloadDeleteWordDoc() throws IOException {
+        Path filePath = Paths.get("./test_file.docx");
+        String content = "test contents";
+
+        Files.write(filePath, content.getBytes());
+        DriveFile testFile = DriveMain.uploadFile(filePath.toString());
+
+        Files.delete(filePath);
+        System.out.println(testFile);
+        DriveMain.downloadFile(testFile, ".");
+
+        DriveMain.deleteFile(testFile);
+
+        assertTrue(Files.exists(filePath));
+        Files.delete(filePath);
+    }
+
+    @Test
+    void testUploadDownloadDeletePdf() throws IOException {
+        Path filePath = Paths.get("./test_file.pdf");
+        String content = "test contents";
+
+        Files.write(filePath, content.getBytes());
+        DriveFile testFile = DriveMain.uploadFile(filePath.toString());
+
+        Files.delete(filePath);
+        System.out.println(testFile);
+        DriveMain.downloadFile(testFile, ".");
+
+        DriveMain.deleteFile(testFile);
+
+        assertTrue(Files.exists(filePath));
+        Files.delete(filePath);
+    }
+
+    @Test
+    void testGetFilesBatch2() throws IOException {
+        List<DriveFile> files_batch1 = DriveMain.getFiles(true);
+        List<DriveFile> files_batch2 = DriveMain.getFiles(true);
+
+        assertEquals(files_batch1.get(0).getName(), files_batch2.get(0).getName());
     }
 }
