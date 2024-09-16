@@ -1,5 +1,8 @@
 import com.google.api.client.util.DateTime;
 
+/**
+ * Class representing a Google Drive file
+ */
 public class DriveFile {
     String Id;
     String Name;

@@ -18,6 +18,9 @@ import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+/**
+ * Helper class to interact with Google Drive API
+ */
 public class DriveMain {
   private static final String APPLICATION_NAME = "Google Drive Application";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();  // Global instance of the JSON factory.
@@ -202,10 +205,5 @@ public class DriveMain {
   public static void deleteFile(DriveFile file) throws IOException {
     service.files().delete(file.Id).execute();
     System.out.println("File deleted successfully");
-  }
-
-  public static void main(String... args) throws IOException, GeneralSecurityException {
-    initService();
-    DriveFile testDoc = new DriveFile("1QRqhhwP9v6KeHoQ_T_3OVyT_l7uvekWHBpCCu5eLOcA", "TESTDOC", "application/vnd.google-apps.document", null);
   }
 }

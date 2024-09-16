@@ -17,37 +17,60 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.time.format.DateTimeFormatter;
 
+/**
+ * Entrypoint of the application
+ */
 public class DriveApplication extends Application {
 
     public static TableView<DriveFile> table;
 
     private static ObservableList<DriveFile> fileList;
 
+    /**
+     * Helper method to start over the Google Drive file query
+     */
     public static void refreshTable() throws IOException {
         fileList = FXCollections.observableArrayList(DriveMain.getFiles(true));
         table.setItems(fileList);
         table.scrollTo(0);
     }
 
+    /**
+     * Helper method to add another batch of Google Drive files into the table
+     */
     public static void loadMoreItems() throws IOException {
         fileList.addAll(DriveMain.getFiles(false));
     }
 
+    /**
+     * Helper method to notify the user with a message
+     *
+     * @param message The desired message to be shown
+     */
     private static void alert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
+    /**
+     * Helper method to alert the user of an error with a message
+     *
+     * @param message The desired message to be shown
+     */
     private static void error(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
-    // Method to check if the user is at the bottom of the table
+    /**
+     * Check if the user is scrolled to the bottom of the table
+     *
+     * @param table The specified TableView object to check
+     * @return True if the user is scrolled to the bottom of the table
+     */
     private boolean isScrolledToBottom(TableView<?> table) {
         TableViewSkin<?> skin = (TableViewSkin<?>)table.getSkin();
         if (skin != null) {
