@@ -5,6 +5,5 @@
 build
 
 tokens
-credentials.json
 .idea
 .DS_Store
