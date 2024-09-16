@@ -34,8 +34,6 @@ class DriveApplicationTest {
         robot.sleep(1000);
         int doubledTableSize = DriveApplication.table.getItems().size();
         robot.clickOn("#refreshButton").sleep(1000);
-//        robot.doubleClickOn("#refreshButton");
-//        robot.sleep(5000);
         int afterRefreshTableSize = DriveApplication.table.getItems().size();
         assertEquals(doubledTableSize / 2, afterRefreshTableSize);
     }
