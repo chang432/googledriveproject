@@ -4,6 +4,6 @@ A simple desktop application to interact with Google Drive files. Allows users t
 files hosted on Google Drive. 
 
 ## Testing and Running
-Make sure workspace is in the project root directory
+Make sure working directory is the project root directory
 To run the application: './gradlew run'
 To test the application: './gradlew test'

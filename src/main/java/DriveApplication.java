@@ -41,6 +41,12 @@ public class DriveApplication extends Application {
         alert.showAndWait();
     }
 
+    private static void error(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     // Method to check if the user is at the bottom of the table
     private boolean isScrolledToBottom(TableView<?> table) {
         TableViewSkin<?> skin = (TableViewSkin<?>)table.getSkin();
@@ -113,7 +119,8 @@ public class DriveApplication extends Application {
                     try {
                         DriveMain.downloadFile(selectedItem, directoryPath);
                         alert("Download Succeeded!");
-                    } catch (IOException e) {
+                    } catch (Exception e) {
+                        error(e.getMessage());
                         throw new RuntimeException(e);
                     }
                 } else {

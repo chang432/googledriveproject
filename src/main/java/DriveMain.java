@@ -42,18 +42,24 @@ public class DriveMain {
   private static final Map<String, String> MIMETYPE_EXTENSIONS_MAP = new HashMap<>();
   static {
     MIMETYPE_EXTENSIONS_MAP.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx");
+    MIMETYPE_EXTENSIONS_MAP.put("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx");
     MIMETYPE_EXTENSIONS_MAP.put("text/csv", ".csv");
     MIMETYPE_EXTENSIONS_MAP.put("application/pdf", ".pdf");
     MIMETYPE_EXTENSIONS_MAP.put("text/plain", ".txt");
+    MIMETYPE_EXTENSIONS_MAP.put("image/jpeg", ".jpg");
+    MIMETYPE_EXTENSIONS_MAP.put("image/png", ".png");
   }
 
   /** File extension mapped to working MIMETYPE */
   private static final Map<String, String> EXTENSION_MIMETYPE_MAP = new HashMap<>();
   static {
     EXTENSION_MIMETYPE_MAP.put(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    EXTENSION_MIMETYPE_MAP.put(".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
     EXTENSION_MIMETYPE_MAP.put(".csv", "text/csv");
     EXTENSION_MIMETYPE_MAP.put(".pdf", "application/pdf");
     EXTENSION_MIMETYPE_MAP.put(".txt", "text/plain");
+    EXTENSION_MIMETYPE_MAP.put(".jpg", "image/jpeg");
+    EXTENSION_MIMETYPE_MAP.put(".png", "image/png");
   }
 
   /**
@@ -119,7 +125,7 @@ public class DriveMain {
       System.out.println("No files found.");
     } else {
       for (File file : files) {
-        DriveFile fileDrive = new DriveFile(file.getId(), file.getName(), file.getMimeType(), file.getModifiedTime());
+        DriveFile fileDrive = new DriveFile(file.getId(), file.getName(), file.getMimeType().trim(), file.getModifiedTime());
         res.add(fileDrive);
       }
     }
@@ -132,7 +138,11 @@ public class DriveMain {
    * @param file The desired Google Drive file to be downloaded represented as a DriveFile object
    * @param destination The desired local target directory for the file to be downloaded to
    */
-  public static void downloadFile(DriveFile file, String destination) throws IOException {
+  public static void downloadFile(DriveFile file, String destination) throws Exception {
+    if (file.Type.equals("application/vnd.google-apps.folder")) {
+      throw new Exception("DOWNLOADING DIRECTORIES FORBIDDEN");
+    }
+
     boolean isDocsDownload = false;
 
     String mimetype = file.Type;
@@ -149,7 +159,11 @@ public class DriveMain {
 
     String extension = MIMETYPE_EXTENSIONS_MAP.get(mimetype);
 
-    String destFilePath = destination + "/" + file.Name.replace(" ","-") + extension;
+    String destFilePath = destination + "/" + file.Name.replace(" ","-");
+    if (file.getName().lastIndexOf(".") == -1) {
+      destFilePath += extension;
+    }
+
     System.out.println(destFilePath + ", " + mimetype);
     OutputStream outputStream = new FileOutputStream(destFilePath);
     if (isDocsDownload) {

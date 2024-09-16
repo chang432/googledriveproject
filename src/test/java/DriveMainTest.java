@@ -16,9 +16,8 @@ public class DriveMainTest {
         DriveMain.initService();
     }
 
-
     @Test
-    void testUploadDownloadDeleteTextFile() throws IOException {
+    void testUploadDownloadDeleteTextFile() throws Exception {
         Path filePath = Paths.get("./test_file.txt");
         String content = "test contents";
 
@@ -37,7 +36,7 @@ public class DriveMainTest {
     }
 
     @Test
-    void testUploadDownloadDeleteWordDoc() throws IOException {
+    void testUploadDownloadDeleteWordDoc() throws Exception {
         Path filePath = Paths.get("./test_file.docx");
         String content = "test contents";
 
@@ -55,7 +54,7 @@ public class DriveMainTest {
     }
 
     @Test
-    void testUploadDownloadDeletePdf() throws IOException {
+    void testUploadDownloadDeletePdf() throws Exception {
         Path filePath = Paths.get("./test_file.pdf");
         String content = "test contents";
 
@@ -73,7 +72,7 @@ public class DriveMainTest {
     }
 
     @Test
-    void testGetFilesBatch2() throws IOException {
+    void testGetFilesBatch() throws IOException {
         List<DriveFile> files_batch1 = DriveMain.getFiles(true);
         List<DriveFile> files_batch2 = DriveMain.getFiles(true);
 
