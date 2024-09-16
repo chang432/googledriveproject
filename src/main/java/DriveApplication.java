@@ -2,10 +2,13 @@ import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -158,8 +161,13 @@ public class DriveApplication extends Application {
             }
         });
 
+        HBox buttonLayout = new HBox(40);
+        buttonLayout.setAlignment(Pos.CENTER);
+        buttonLayout.getChildren().addAll(uploadButton, downloadButton, refreshButton, deleteButton);
+        VBox.setMargin(buttonLayout, new Insets(0,0,10,0));
+
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(table, uploadButton, downloadButton, refreshButton, deleteButton);
+        layout.getChildren().addAll(table, buttonLayout);
 
         Scene scene = new Scene(layout, 600, 400);
         primaryStage.setTitle("Google Docs Application");

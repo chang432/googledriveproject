@@ -22,7 +22,7 @@ public class DriveMain {
   private static final String APPLICATION_NAME = "Google Drive Application";
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();  // Global instance of the JSON factory.
   private static final String TOKENS_DIRECTORY_PATH = "tokens";  // Directory to store authorization tokens for this application.
-  private static final int PAGE_SIZE = 10;    // default number of files displayed
+  private static final int PAGE_SIZE = 20;    // default number of files displayed
   private static Drive service;
   private static String pageToken;
 
@@ -193,13 +193,8 @@ public class DriveMain {
   public static void main(String... args) throws IOException, GeneralSecurityException {
     // Build a new authorized API client service.
     initService();
-    List<DriveFile> test = getFiles(false);
-    test.forEach(i -> System.out.println(i.toString()));
-    System.out.println("-----");
-    List<DriveFile> test1 = getFiles(false);
-    test1.forEach(i -> System.out.println(i.toString()));
 //    System.out.println(test.get(0).toString());
-//    DriveFile testDoc = new DriveFile("1QRqhhwP9v6KeHoQ_T_3OVyT_l7uvekWHBpCCu5eLOcA", "TESTDOC", "application/vnd.google-apps.document", null);
+    DriveFile testDoc = new DriveFile("1QRqhhwP9v6KeHoQ_T_3OVyT_l7uvekWHBpCCu5eLOcA", "TESTDOC", "application/vnd.google-apps.document", null);
 //    DriveFile testTest = new DriveFile("16VVWywDmoLuTHbL2C9CZT1XSux4NDpcA", "test_file", "application/pdf", null);
 //    DriveFile textSheet = new DriveFile("1DSsH27NQ11qy0EWkOO2mVAjUHqBLhrz4uFo-gUO_BLk", "Japan 2025", "application/vnd.google-apps.spreadsheet", null);
 //    DriveFile n = uploadFile("./hello.txt");

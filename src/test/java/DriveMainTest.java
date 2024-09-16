@@ -77,6 +77,13 @@ public class DriveMainTest {
         List<DriveFile> files_batch1 = DriveMain.getFiles(true);
         List<DriveFile> files_batch2 = DriveMain.getFiles(true);
 
-        assertEquals(files_batch1.get(0).getName(), files_batch2.get(0).getName());
+        boolean res = true;
+        for (int i=0;i<files_batch1.size();i++) {
+            if (!files_batch1.get(i).getName().equals(files_batch2.get(i).getName())) {
+                res = false;
+                break;
+            }
+        }
+        assertTrue(res);
     }
 }
