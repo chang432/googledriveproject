@@ -25,7 +25,6 @@ public class DriveMainTest {
         DriveFile testFile = DriveMain.uploadFile(filePath.toString());
 
         Files.delete(filePath);
-        System.out.println(testFile);
         DriveMain.downloadFile(testFile, ".");
 
         DriveMain.deleteFile(testFile);
@@ -44,7 +43,6 @@ public class DriveMainTest {
         DriveFile testFile = DriveMain.uploadFile(filePath.toString());
 
         Files.delete(filePath);
-        System.out.println(testFile);
         DriveMain.downloadFile(testFile, ".");
 
         DriveMain.deleteFile(testFile);
@@ -62,7 +60,6 @@ public class DriveMainTest {
         DriveFile testFile = DriveMain.uploadFile(filePath.toString());
 
         Files.delete(filePath);
-        System.out.println(testFile);
         DriveMain.downloadFile(testFile, ".");
 
         DriveMain.deleteFile(testFile);

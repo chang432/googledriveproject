@@ -160,7 +160,7 @@ public class DriveMain {
     String extension = MIMETYPE_EXTENSIONS_MAP.get(mimetype);
 
     String destFilePath = destination + "/" + file.Name.replace(" ","-");
-    if (file.getName().lastIndexOf(".") == -1) {
+    if (file.getName().lastIndexOf(".") == -1) {   // only add extension to file name if it doesn't already exist
       destFilePath += extension;
     }
 
@@ -205,15 +205,7 @@ public class DriveMain {
   }
 
   public static void main(String... args) throws IOException, GeneralSecurityException {
-    // Build a new authorized API client service.
     initService();
-//    System.out.println(test.get(0).toString());
     DriveFile testDoc = new DriveFile("1QRqhhwP9v6KeHoQ_T_3OVyT_l7uvekWHBpCCu5eLOcA", "TESTDOC", "application/vnd.google-apps.document", null);
-//    DriveFile testTest = new DriveFile("16VVWywDmoLuTHbL2C9CZT1XSux4NDpcA", "test_file", "application/pdf", null);
-//    DriveFile textSheet = new DriveFile("1DSsH27NQ11qy0EWkOO2mVAjUHqBLhrz4uFo-gUO_BLk", "Japan 2025", "application/vnd.google-apps.spreadsheet", null);
-//    DriveFile n = uploadFile("./hello.txt");
-//    downloadFile(testDoc,"./src");
-//    System.out.println(n);
-//    deleteFile(testDoc);
   }
 }

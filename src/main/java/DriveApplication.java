@@ -21,17 +21,17 @@ import java.time.format.DateTimeFormatter;
 
 public class DriveApplication extends Application {
 
-    private static TableView<DriveFile> table;
+    public static TableView<DriveFile> table;
 
     private static ObservableList<DriveFile> fileList;
 
-    private static void refreshTable() throws IOException {
+    public static void refreshTable() throws IOException {
         fileList = FXCollections.observableArrayList(DriveMain.getFiles(true));
         table.setItems(fileList);
         table.scrollTo(0);
     }
 
-    private static void loadMoreItems() throws IOException {
+    public static void loadMoreItems() throws IOException {
         fileList.addAll(DriveMain.getFiles(false));
     }
 
@@ -62,7 +62,6 @@ public class DriveApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         table = new TableView<>();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 
         TableColumn<DriveFile, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().Name));
@@ -70,18 +69,21 @@ public class DriveApplication extends Application {
         TableColumn<DriveFile, String> typeColumn = new TableColumn<>("Type");
         typeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().Type));
 
-        TableColumn<DriveFile, String> dateColumn = new TableColumn<>("Modified Date");
+        TableColumn<DriveFile, String> dateColumn = new TableColumn<>("Last Modified Date");
         dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().LastModifiedDate.toString()));
-//        dateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(""));
 
         table.getColumns().addAll(nameColumn, typeColumn, dateColumn);
 
         refreshTable();
 
         Button uploadButton = new Button("Upload");
+        uploadButton.setId("uploadButton");
         Button downloadButton = new Button("Download");
+        downloadButton.setId("downloadButton");
         Button refreshButton = new Button("Refresh");
+        refreshButton.setId("refreshButton");
         Button deleteButton = new Button("Delete");
+        deleteButton.setId("deleteButton");
 
         // Upload button action
         uploadButton.setOnAction(event -> {
@@ -177,7 +179,7 @@ public class DriveApplication extends Application {
         layout.getChildren().addAll(table, buttonLayout);
 
         Scene scene = new Scene(layout, 600, 400);
-        primaryStage.setTitle("Google Docs Application");
+        primaryStage.setTitle("Google Drive Application");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
