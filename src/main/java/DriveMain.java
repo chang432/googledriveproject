@@ -33,15 +33,14 @@ public class DriveMain {
       Collections.singletonList(DriveScopes.DRIVE);
   private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-  /** MIMETYPE returned by java api mapped to working MIMETYPE */
+  /** Default Google Drive MIMETYPE mapped to working MIMETYPE */
   private static final Map<String, String> MIMETYPE_MAP = new HashMap<>();
   static {
     MIMETYPE_MAP.put("application/vnd.google-apps.document", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     MIMETYPE_MAP.put("application/vnd.google-apps.spreadsheet", "text/csv");
-    MIMETYPE_MAP.put("application/octet-stream", "text/plain");
   }
 
-  /** Working MIMETYPE mapped to file extension */
+  /** MIMETYPE mapped to file extension */
   private static final Map<String, String> MIMETYPE_EXTENSIONS_MAP = new HashMap<>();
   static {
     MIMETYPE_EXTENSIONS_MAP.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx");
@@ -53,7 +52,7 @@ public class DriveMain {
     MIMETYPE_EXTENSIONS_MAP.put("image/png", ".png");
   }
 
-  /** File extension mapped to working MIMETYPE */
+  /** File extension mapped to MIMETYPE */
   private static final Map<String, String> EXTENSION_MIMETYPE_MAP = new HashMap<>();
   static {
     EXTENSION_MIMETYPE_MAP.put(".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
